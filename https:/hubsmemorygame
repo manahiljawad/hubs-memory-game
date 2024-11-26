@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Game</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            gap: 10px;
+        }
+        .card {
+            width: 100px;
+            height: 100px;
+            background-color: #3498db;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            cursor: pointer;
+            border-radius: 8px;
+            color: transparent;
+            transition: 0.3s;
+        }
+        .card.flipped {
+            background-color: #2ecc71;
+            color: black;
+        }
+        .card.matched {
+            background-color: #f39c12;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-board" id="game-board"></div>
+
+    <script>
+        const emojis = ['🍎', '🍌', '🍓', '🍍', '🍒', '🍉', '🍊', '🍓'];
+        const shuffledEmojis = [...emojis, ...emojis].sort(() => Math.random() - 0.5);
+        let flippedCards = [];
+        let matchedCards = [];
+        let isGameOver = false;
+
+        const gameBoard = document.getElementById('game-board');
+
+        function createCard(emoji) {
+            const card = document.createElement('div');
+            card.classList.add('card');
+            card.textContent = emoji;
+            card.addEventListener('click', flipCard);
+            return card;
+        }
+
+        function flipCard() {
+            if (isGameOver || this.classList.contains('flipped') || flippedCards.length === 2) return;
+
+            this.classList.add('flipped');
+            flippedCards.push(this);
+
+            if (flippedCards.length === 2) {
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            const [firstCard, secondCard] = flippedCards;
+            if (firstCard.textContent === secondCard.textContent) {
+                firstCard.classList.add('matched');
+                secondCard.classList.add('matched');
+                matchedCards.push(firstCard, secondCard);
+                flippedCards = [];
+
+                if (matchedCards.length === shuffledEmojis.length) {
+                    setTimeout(() => alert('Congratulations, You Won!'), 500);
+                    isGameOver = true;
+                }
+            } else {
+                setTimeout(() => {
+                    firstCard.classList.remove('flipped');
+                    secondCard.classList.remove('flipped');
+                    flippedCards = [];
+                }, 1000);
+            }
+        }
+
+        shuffledEmojis.forEach(emoji => {
+            const card = createCard(emoji);
+            gameBoard.appendChild(card);
+        });
+    </script>
+</body>
+</html>
